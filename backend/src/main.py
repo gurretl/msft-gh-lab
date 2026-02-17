@@ -40,7 +40,7 @@ async def lifespan(app: FastAPI):
             # Don't fail startup - let individual requests handle the error
     
     yield
-    
+
     # Cleanup on shutdown
     logger.info("Shutting down application...")
     if storage_mode == "cosmos":
