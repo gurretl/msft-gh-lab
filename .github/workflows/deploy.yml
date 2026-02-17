@@ -38,10 +38,10 @@ jobs:
         uses: Azure/setup-azd@v2
 
       - name: Initialize azd project
-        run: azd init --cwd . --no-prompt || true
+        run: azd init --cwd . --no-prompt --template . --name inventory-app || true
 
       - name: Ensure azd environment exists
-        run: azd env new ${{ inputs.azure_env_name }} --no-prompt --defaults --cwd . || true
+        run: azd env new ${{ inputs.azure_env_name }} --no-prompt --cwd . || true
 
       - name: Select azd environment
         run: azd env select ${{ inputs.azure_env_name }}
