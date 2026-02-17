@@ -37,12 +37,10 @@ jobs:
 
       - name: Set up azd
         uses: Azure/setup-azd@v2
+        with:
+          version: 1.6.0
 
 
-      - name: Initialize azd project
-        run: azd init --cwd . --no-prompt --template . || true
-        env:
-          AZD_AUTH_TYPE: AZCLI
 
       - name: Ensure azd environment exists
         run: azd env new ${{ inputs.azure_env_name }} --no-prompt --cwd . || true
