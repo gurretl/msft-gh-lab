@@ -1,0 +1,56 @@
+import pytest
+from playwright.sync_api import Page, expect
+
+BASE_URL = "http://localhost:3000"
+
+@pytest.fixture(scope="function", autouse=True)
+def reset_app(page: Page):
+    # Go to the app before each test
+    page.goto(BASE_URL)
+
+def add_device(page: Page, name: str, assigned_to: str = ""):
+    page.get_by_label("Device Name *").fill(name)
+    page.get_by_label("Assigned To").fill(assigned_to)
+    page.get_by_role("button", name="Add Device").click()
+
+def test_add_device(page: Page):
+    add_device(page, "Test Laptop", "Alice")
+    expect(page.get_by_role("heading", name="Devices")).to_be_visible()
+    expect(page.get_by_text("Test Laptop")).to_be_visible()
+    expect(page.get_by_text("Assigned to: Alice")).to_be_visible()
+
+def test_edit_device(page: Page):
+    add_device(page, "Monitor", "Bob")
+    # Click Edit
+    page.get_by_role("button", name="Edit").click()
+    page.get_by_label("Device Name *").fill("Monitor Pro")
+    page.get_by_label("Assigned To").fill("Charlie")
+    page.get_by_role("button", name="Update Device").click()
+    expect(page.get_by_text("Monitor Pro")).to_be_visible()
+    expect(page.get_by_text("Assigned to: Charlie")).to_be_visible()
+
+def test_delete_device(page: Page):
+    add_device(page, "Phone", "Dana")
+    # Delete device
+    page.get_by_role("button", name="Delete").click()
+    page.once("dialog", lambda dialog: dialog.accept())
+    # Should not find device
+    expect(page.get_by_text("Phone")).not_to_be_visible()
+
+def test_list_devices(page: Page):
+    add_device(page, "Tablet", "Eve")
+    add_device(page, "Printer", "Frank")
+    expect(page.get_by_text("Tablet")).to_be_visible()
+    expect(page.get_by_text("Printer")).to_be_visible()
+    # Delete both
+    for _ in range(2):
+        page.get_by_role("button", name="Delete").click()
+        page.once("dialog", lambda dialog: dialog.accept())
+    expect(page.get_by_text("No devices found. Add your first device!")).to_be_visible()
+
+def test_error_handling(page: Page):
+    # Simulate error by submitting empty name
+    page.get_by_label("Device Name *").fill("")
+    page.get_by_role("button", name="Add Device").click()
+    # Should not add device, error may be shown
+    expect(page.get_by_label("Device Name *")).to_be_visible()

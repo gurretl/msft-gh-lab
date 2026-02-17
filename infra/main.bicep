@@ -98,7 +98,7 @@ module frontend 'core/host/container-app.bicep' = {
         name: 'BACKEND_URL'
         value: 'http://localhost'
       }
-    ] // Backend URL will be set accurately after backend is created
+    ]  // Backend URL will be set accurately after backend is created
   }
 }
 
