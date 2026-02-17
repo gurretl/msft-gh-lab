@@ -63,6 +63,15 @@ jobs:
           AZD_AUTH_TYPE: AZCLI
 
 
+      - name: Debug azd and az login
+        run: |
+          az --version
+          azd version
+          az account show
+        env:
+          AZD_AUTH_TYPE: AZCLI
+
+
       - name: Provision infrastructure
         run: azd provision --no-prompt
         env:
