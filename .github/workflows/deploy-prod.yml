@@ -1,24 +1,37 @@
-# Prod Deployment Workflow
-# Manual trigger for production deployment
 
-name: Deploy to Prod
+name: Deploy Prod
 
 on:
   workflow_dispatch:
     inputs:
-      confirm:
-        description: 'Type "prod" to confirm production deployment'
+      confirm_production_deployment:
+        description: Confirm production deployment
         required: true
-        default: ''
+        type: boolean
 
 permissions:
-  id-token: write
   contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
 
 jobs:
-  deploy-prod:
-    name: Deploy to Prod
-    if: ${{ github.event.inputs.confirm == 'prod' }}
+  validate:
+    name: Validate confirmation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm production deployment
+        run: |
+          if [[ "${{ inputs.confirm_production_deployment }}" != "true" ]]; then
+            echo "confirm_production_deployment must be true to proceed."
+            exit 1
+          fi
+
+  deploy:
+    name: Deploy prod
+    needs: validate
     uses: ./.github/workflows/deploy.yml
     with:
       environment: prod
