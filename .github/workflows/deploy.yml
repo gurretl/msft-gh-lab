@@ -37,6 +37,9 @@ jobs:
       - name: Set up azd
         uses: Azure/setup-azd@v2
 
+      - name: Initialize azd project
+        run: azd init --cwd . --no-prompt || true
+
       - name: Ensure azd environment exists
         run: azd env new ${{ inputs.azure_env_name }} --no-prompt --defaults --cwd . || true
 
