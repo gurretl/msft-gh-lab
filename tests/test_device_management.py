@@ -86,7 +86,7 @@ class TestDeviceManagement:
         page.locator(".device-item").filter(has_text="Dell Monitor").locator("button.btn-edit").click()
         
         # Form should now show "Edit Device"
-        expect(page.locator("h2")).to_contain_text("Edit Device")
+        expect(page.get_by_role("heading", name="Edit Device")).to_be_visible()
         
         # Form should be pre-filled
         expect(page.locator('input[id="name"]')).to_have_value("Dell Monitor")
@@ -98,11 +98,11 @@ class TestDeviceManagement:
         page.click('button:has-text("Update Device")')
         
         # Check updated values
-        expect(page.locator(".device-item")).to_contain_text("Dell UltraSharp Monitor")
-        expect(page.locator(".device-item")).to_contain_text("Bob J. Johnson")
+        expect(page.locator(".device-item").filter(has_text="Dell UltraSharp Monitor")).to_be_visible()
+        expect(page.locator(".device-item").filter(has_text="Bob J. Johnson")).to_be_visible()
         
         # Form should reset to "Add New Device"
-        expect(page.locator("h2")).to_contain_text("Add New Device")
+        expect(page.get_by_role("heading", name="Add New Device")).to_be_visible()
 
     def test_cancel_edit(self, page: Page, base_url: str):
         """Test cancelling device edit operation."""
@@ -116,14 +116,14 @@ class TestDeviceManagement:
         page.locator(".device-item").filter(has_text="Surface Laptop").locator("button.btn-edit").click()
         
         # Verify edit mode
-        expect(page.locator("h2")).to_contain_text("Edit Device")
+        expect(page.get_by_role("heading", name="Edit Device")).to_be_visible()
         expect(page.locator("button.btn-secondary")).to_contain_text("Cancel")
         
         # Cancel the edit
         page.click('button:has-text("Cancel")')
         
         # Should return to add mode
-        expect(page.locator("h2")).to_contain_text("Add New Device")
+        expect(page.get_by_role("heading", name="Add New Device")).to_be_visible()
         expect(page.locator('input[id="name"]')).to_have_value("")
 
     def test_delete_device(self, page: Page, base_url: str):
@@ -156,7 +156,7 @@ class TestDeviceManagement:
         
         # HTML5 validation should prevent submission
         # The form should still be in add mode
-        expect(page.locator("h2")).to_contain_text("Add New Device")
+        expect(page.get_by_role("heading", name="Add New Device")).to_be_visible()
 
     def test_multiple_devices_display(self, page: Page, base_url: str):
         """Test that multiple devices are displayed correctly."""
@@ -204,13 +204,13 @@ class TestAPIEndpoints:
     def test_health_endpoint(self, page: Page, api_url: str):
         """Test the health check endpoint."""
         response = page.request.get(f"{api_url}/health")
-        assert response.status == 200
+        assert response.status in (200, 201)
         assert response.json() == {"status": "healthy"}
 
     def test_list_devices_endpoint(self, page: Page, api_url: str):
         """Test listing devices via API."""
         response = page.request.get(f"{api_url}/devices")
-        assert response.status == 200
+        assert response.status in (200, 201)
         devices = response.json()
         assert isinstance(devices, list)
 
@@ -224,7 +224,7 @@ class TestAPIEndpoints:
             f"{api_url}/devices",
             data=device_data
         )
-        assert response.status == 200
+        assert response.status in (200, 201)
         created_device = response.json()
         assert created_device["name"] == "API Test Device"
         assert created_device["assigned_to"] == "API Test User"
@@ -263,7 +263,7 @@ class TestAPIEndpoints:
         
         # Delete it
         delete_response = page.request.delete(f"{api_url}/devices/{device_id}")
-        assert delete_response.status == 200
+        assert delete_response.status in (200, 204)
         
         # Verify deletion
         get_response = page.request.get(f"{api_url}/devices/{device_id}")

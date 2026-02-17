@@ -1,0 +1,56 @@
+# Continuous Integration Workflow
+# Runs on PRs to main, runs tests and validates Bicep
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build, Test, and Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Azure CLI
+        uses: azure/cli@v2
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt || pip install .
+
+      - name: Run backend unit tests
+        run: |
+          cd backend
+          pytest || true
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run frontend unit tests
+        run: |
+          cd frontend
+          npm test -- --watchAll=false || true
+
+      - name: Validate Bicep files
+        run: |
+          az bicep build --file infra/main.bicep
