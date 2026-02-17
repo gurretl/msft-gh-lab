@@ -1,7 +1,4 @@
-# Reusable Azure Deployment Workflow
-# See plan/cicd-setup.md and best practices for details
-
-name: Azure Deploy (Reusable)
+name: Deploy (Reusable)
 
 on:
   workflow_call:
@@ -12,52 +9,49 @@ on:
       azure_env_name:
         required: true
         type: string
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
 
 permissions:
-  id-token: write
   contents: read
+  id-token: write
 
 jobs:
   deploy:
-    name: Deploy to Azure
+    name: Deploy ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Azure Login (OIDC)
+      - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: false
 
-
-      - name: Set up azd
-        uses: Azure/setup-azd@v2
-        with:
-          version: 1.6.0
-
-
-
-      - name: Ensure azd environment exists
-        run: azd env new ${{ inputs.azure_env_name }} --no-prompt --cwd . || true
-        env:
-          AZD_AUTH_TYPE: AZCLI
+      - name: Setup Azure Developer CLI
+        uses: Azure/setup-azd@v1
 
       - name: Select azd environment
-        run: azd env select ${{ inputs.azure_env_name }}
-        env:
-          AZD_AUTH_TYPE: AZCLI
+        run: azd env select "${{ inputs.azure_env_name }}"
+
+      - name: Set image tags
+        run: |
+          azd env set SERVICE_BACKEND_IMAGE_NAME "backend:${{ github.sha }}"
+          azd env set SERVICE_FRONTEND_IMAGE_NAME "frontend:${{ github.sha }}"
 
       - name: Provision infrastructure
-        run: azd provision
-        env:
-          AZD_AUTH_TYPE: AZCLI
+        run: azd provision --no-prompt
 
       - name: Deploy application
-        run: azd deploy
-        env:
-          AZD_AUTH_TYPE: AZCLI
+        run: azd deploy --no-prompt
