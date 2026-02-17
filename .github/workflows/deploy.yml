@@ -41,15 +41,25 @@ jobs:
 
       - name: Initialize azd project
         run: azd init --cwd . --no-prompt --template . || true
+        env:
+          AZD_AUTH_TYPE: AZCLI
 
       - name: Ensure azd environment exists
         run: azd env new ${{ inputs.azure_env_name }} --no-prompt --cwd . || true
+        env:
+          AZD_AUTH_TYPE: AZCLI
 
       - name: Select azd environment
         run: azd env select ${{ inputs.azure_env_name }}
+        env:
+          AZD_AUTH_TYPE: AZCLI
 
       - name: Provision infrastructure
         run: azd provision
+        env:
+          AZD_AUTH_TYPE: AZCLI
 
       - name: Deploy application
         run: azd deploy
+        env:
+          AZD_AUTH_TYPE: AZCLI
