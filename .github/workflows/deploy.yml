@@ -76,6 +76,7 @@ jobs:
         run: azd provision --no-prompt
         env:
           AZD_AUTH_TYPE: AZCLI
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 
       - name: Deploy application
