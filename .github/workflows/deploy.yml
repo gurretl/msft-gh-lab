@@ -35,7 +35,7 @@ jobs:
           enable-AzPSSession: false
 
       - name: Set up azd
-        uses: Azure/setup-azd@v1
+        uses: Azure/setup-azd@v0
 
       - name: Select azd environment
         run: azd env select ${{ inputs.azure_env_name }}
