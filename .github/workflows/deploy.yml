@@ -37,6 +37,9 @@ jobs:
       - name: Set up azd
         uses: Azure/setup-azd@v2
 
+      - name: Ensure azd environment exists
+        run: azd env new ${{ inputs.azure_env_name }} --no-prompt --defaults || true
+
       - name: Select azd environment
         run: azd env select ${{ inputs.azure_env_name }}
 
