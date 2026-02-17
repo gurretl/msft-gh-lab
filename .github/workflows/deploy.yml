@@ -34,11 +34,15 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: false
 
+
       - name: Set up azd
         uses: Azure/setup-azd@v2
 
+      - name: Authenticate azd with Azure OIDC
+        run: azd auth login --client-id ${{ secrets.AZURE_CLIENT_ID }} --federated-credential
+
       - name: Initialize azd project
-        run: azd init --cwd . --no-prompt --template . --name inventory-app || true
+        run: azd init --cwd . --no-prompt --template . || true
 
       - name: Ensure azd environment exists
         run: azd env new ${{ inputs.azure_env_name }} --no-prompt --cwd . || true
