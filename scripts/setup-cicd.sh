@@ -76,9 +76,7 @@ if [[ "$EXISTING_FED_CRED_COUNT" == "0" ]]; then
       --arg subject "$SUBJECT" \
       --arg audience "api://AzureADTokenExchange" \
       '{name:$name, issuer:$issuer, subject:$subject, audiences:[$audience]}')" \
-    >/dev/null || true
-else
-  echo "FederatedIdentityCredential with name github-${ENV_NAME} already exists. Continuing GitHub setup..."
+    >/dev/null
 fi
 
 gh api -X PUT "repos/${REPO_OWNER}/${REPO_NAME}/environments/${ENV_NAME}" >/dev/null

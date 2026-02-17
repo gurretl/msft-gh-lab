@@ -40,46 +40,18 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Setup Azure Developer CLI
-        uses: Azure/setup-azd@v2
-
-
-      - name: Ensure azd environment exists
-        run: azd env new "${{ inputs.azure_env_name }}" --no-prompt || true
-        env:
-          AZD_AUTH_TYPE: AZCLI
-
+        uses: Azure/setup-azd@v1
 
       - name: Select azd environment
         run: azd env select "${{ inputs.azure_env_name }}"
-        env:
-          AZD_AUTH_TYPE: AZCLI
-
 
       - name: Set image tags
         run: |
           azd env set SERVICE_BACKEND_IMAGE_NAME "backend:${{ github.sha }}"
           azd env set SERVICE_FRONTEND_IMAGE_NAME "frontend:${{ github.sha }}"
-        env:
-          AZD_AUTH_TYPE: AZCLI
-
-
-      - name: Debug azd and az login
-        run: |
-          az --version
-          azd version
-          az account show
-        env:
-          AZD_AUTH_TYPE: AZCLI
-
 
       - name: Provision infrastructure
         run: azd provision --no-prompt
-        env:
-          AZD_AUTH_TYPE: AZCLI
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
 
       - name: Deploy application
         run: azd deploy --no-prompt
-        env:
-          AZD_AUTH_TYPE: AZCLI
