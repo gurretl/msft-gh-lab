@@ -42,6 +42,13 @@ jobs:
       - name: Setup Azure Developer CLI
         uses: Azure/setup-azd@v2
 
+
+      - name: Ensure azd environment exists
+        run: |
+          if ! azd env list | grep -q '"${{ inputs.azure_env_name }}"'; then
+            azd env new "${{ inputs.azure_env_name }}" --no-prompt
+          fi
+
       - name: Select azd environment
         run: azd env select "${{ inputs.azure_env_name }}"
 
