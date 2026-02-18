@@ -40,10 +40,8 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Setup Azure Developer CLI
-        uses: Azure/setup-azd@v2
+        uses: Azure/setup-azd@v1
 
-      - name: Ensure azd environment exists
-        run: azd env new "${{ inputs.azure_env_name }}" --no-prompt || true
       - name: Select azd environment
         run: azd env select "${{ inputs.azure_env_name }}"
 
