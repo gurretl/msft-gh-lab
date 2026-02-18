@@ -42,6 +42,9 @@ jobs:
       - name: Setup Azure Developer CLI
         uses: Azure/setup-azd@v2
 
+      - name: Authenticate azd with Azure login
+        run: azd auth login --client-id ${{ secrets.AZURE_CLIENT_ID }} --federated-credential-provider github
+
       - name: Ensure azd environment exists
         run: |
           if ! azd env list | grep -q '"dev"'; then
