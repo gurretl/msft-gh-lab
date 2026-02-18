@@ -47,8 +47,8 @@ jobs:
 
       - name: Ensure azd environment exists
         run: |
-          if ! azd env list | grep -q '"dev"'; then
-            azd env new dev --no-prompt
+          if ! azd env list | grep -q '"${{ inputs.azure_env_name }}"'; then
+            azd env new "${{ inputs.azure_env_name }}" --no-prompt
           fi
 
 
