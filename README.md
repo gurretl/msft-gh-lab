@@ -4,8 +4,6 @@ A simple inventory management application built with React and FastAPI, deployed
 
 <img alt="image" src="https://github.com/user-attachments/assets/6ed5515b-8d31-436a-ac79-41aee1743d88" />
 
-
-
 ## Features
 
 - Add new devices to inventory
@@ -36,6 +34,7 @@ Use the devcontainer for a ready-to-deploy environment with Azure tooling preins
 ## Local Development
 
 ### Backend
+
 ```bash
 cd backend
 uv sync
@@ -43,6 +42,7 @@ STORAGE_MODE=memory uv run uvicorn src.main:app --reload
 ```
 
 ### Frontend
+
 ```bash
 cd frontend
 npm install
@@ -56,6 +56,7 @@ azd up
 ```
 
 This single command will:
+
 1. Provision all Azure resources (Container Apps, Cosmos DB, Container Registry)
 2. Build and push Docker images
 3. Deploy frontend and backend (backend uses System-Assigned Managed Identity)
@@ -63,8 +64,8 @@ This single command will:
 
 ### Requirements for `azd up`
 
-- Be logged in to Azure: 
-  
+- Be logged in to Azure:
+
   ```bash
   azd auth login
   ```
@@ -72,6 +73,7 @@ This single command will:
 ## Environment Variables
 
 The deployment sets and uses the following:
+
 - `BACKEND_URL`: Backend API endpoint for the frontend
 - `COSMOS_ENDPOINT`: Cosmos DB account endpoint
 - `COSMOS_DB_NAME`: Database name (default: `inventory`)
@@ -87,6 +89,28 @@ The deployment sets and uses the following:
 └──────────────┘      └──────────────┘      └──────────────┘
   Container App         Container App         Serverless
 ```
+
+## CI/CD Pipeline
+
+This project uses a GitHub Actions-based CI/CD pipeline for automated testing and deployment:
+
+- **Pull Requests**: Opening or updating a PR triggers the CI workflow, which runs all tests to ensure code quality.
+- **Dev Deployment**: Merging to the `main` branch automatically deploys the latest code to the Dev environment in Azure.
+- **Production Deployment**: Deployments to the Prod environment require manual approval in GitHub Actions for safety.
+
+### Setting Up the Pipeline
+
+To configure the CI/CD pipeline and required Azure resources, run:
+
+```bash
+./scripts/setup-cicd.sh <env> <location>
+```
+
+Replace `<env>` with your environment name (e.g., `dev` or `prod`) and `<location>` with your Azure region (e.g., `westeurope`).
+
+> **Note:** Most deployments should be performed via GitHub Actions for consistent, reproducible environments. Manual `azd up` is only recommended for local development or troubleshooting.
+
+---
 
 ## Workshop Checkpoints
 
@@ -122,10 +146,10 @@ git checkout -- . && git clean -fd && git switch task-1
 
 ### Available Checkpoints
 
-| Branch   | Description                          |
-|----------|--------------------------------------|
-| `main`   | Starting point                       |
-| `task-1` | Completed Task 1                     |
-| `task-2` | Completed Task 2                     |
-| `task-3` | Completed Task 3                     |
-| `task-4` | Completed Task 4 (final solution)    |
+| Branch   | Description                       |
+| -------- | --------------------------------- |
+| `main`   | Starting point                    |
+| `task-1` | Completed Task 1                  |
+| `task-2` | Completed Task 2                  |
+| `task-3` | Completed Task 3                  |
+| `task-4` | Completed Task 4 (final solution) |
