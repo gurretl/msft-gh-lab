@@ -51,8 +51,12 @@ jobs:
             azd env new dev --no-prompt
           fi
 
+
       - name: Select azd environment
         run: azd env select "${{ inputs.azure_env_name }}"
+
+      - name: Set Azure subscription in azd env
+        run: azd env set AZURE_SUBSCRIPTION_ID "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
       - name: Set image tags
         run: |
